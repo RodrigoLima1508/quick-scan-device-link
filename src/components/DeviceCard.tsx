@@ -9,9 +9,10 @@ import { Device } from '@/types/device';
 interface DeviceCardProps {
   device: Device;
   onClick: () => void;
+  onGenerateQR: (device: Device) => void;
 }
 
-export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
+export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick, onGenerateQR }) => {
   const isOnline = device.status === 'online';
   const formatLastActivity = (date: Date) => {
     const now = new Date();
@@ -82,8 +83,7 @@ export const DeviceCard: React.FC<DeviceCardProps> = ({ device, onClick }) => {
             <Button
               onClick={(e) => {
                 e.stopPropagation();
-                // TODO: Gerar QR code
-                console.log('Generate QR for device:', device.id);
+                onGenerateQR(device);
               }}
               size="sm"
               className="bg-blue-600 hover:bg-blue-700"

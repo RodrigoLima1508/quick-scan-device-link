@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,6 +8,7 @@ import { Plus, Search, Filter, Download, Smartphone, Wifi, WifiOff, Eye } from '
 import { DeviceCard } from '@/components/DeviceCard';
 import { AddDeviceModal } from '@/components/AddDeviceModal';
 import { DeviceDetailModal } from '@/components/DeviceDetailModal';
+import { QRCodeModal } from '@/components/QRCodeModal';
 import { Sidebar } from '@/components/Sidebar';
 import { Device } from '@/types/device';
 import { generateMockDevices } from '@/utils/mockData';
@@ -20,6 +20,7 @@ const Dashboard = () => {
   const [statusFilter, setStatusFilter] = useState<'all' | 'online' | 'offline'>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
+  const [qrDevice, setQrDevice] = useState<Device | null>(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
@@ -51,6 +52,10 @@ const Dashboard = () => {
       lastActivity: new Date()
     };
     setDevices(prev => [...prev, device]);
+  };
+
+  const handleGenerateQR = (device: Device) => {
+    setQrDevice(device);
   };
 
   const stats = {
@@ -191,6 +196,7 @@ const Dashboard = () => {
                 key={device.id}
                 device={device}
                 onClick={() => setSelectedDevice(device)}
+                onGenerateQR={handleGenerateQR}
               />
             ))}
           </div>
@@ -232,6 +238,12 @@ const Dashboard = () => {
           onClose={() => setSelectedDevice(null)}
         />
       )}
+
+      <QRCodeModal
+        device={qrDevice}
+        isOpen={!!qrDevice}
+        onClose={() => setQrDevice(null)}
+      />
     </div>
   );
 };

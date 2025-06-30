@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -19,19 +18,23 @@ import {
   Clock
 } from 'lucide-react';
 import { Device } from '@/types/device';
+import { useToast } from '@/hooks/use-toast';
 
 interface DeviceDetailModalProps {
   device: Device;
   isOpen: boolean;
   onClose: () => void;
+  onGenerateQR?: (device: Device) => void;
 }
 
 export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({ 
   device, 
   isOpen, 
-  onClose 
+  onClose,
+  onGenerateQR 
 }) => {
   const isOnline = device.status === 'online';
+  const { toast } = useToast();
   
   const formatLastActivity = (date: Date) => {
     return new Intl.DateTimeFormat('pt-BR', {
@@ -47,9 +50,21 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({
     return `${window.location.origin}/device/${device.qrHash}`;
   };
 
-  const downloadQRCode = () => {
-    // TODO: Implementar geração e download do QR code
-    console.log('Download QR code for:', device.name);
+  const handleGenerateQR = () => {
+    if (onGenerateQR) {
+      onGenerateQR(device);
+    } else {
+      // Fallback: abrir URL diretamente
+      window.open(generateQRUrl(), '_blank');
+    }
+  };
+
+  const copyUrl = () => {
+    navigator.clipboard.writeText(generateQRUrl());
+    toast({
+      title: "Copiado!",
+      description: "URL copiada para a área de transferência",
+    });
   };
 
   return (
@@ -184,18 +199,15 @@ export const DeviceDetailModal: React.FC<DeviceDetailModalProps> = ({
 
               <div className="flex gap-2">
                 <Button 
-                  onClick={downloadQRCode}
+                  onClick={handleGenerateQR}
                   className="bg-purple-600 hover:bg-purple-700"
                 >
-                  <Download className="w-4 h-4 mr-2" />
-                  Baixar QR Code
+                  <QrCode className="w-4 h-4 mr-2" />
+                  Gerar QR Code
                 </Button>
                 <Button 
                   variant="outline"
-                  onClick={() => {
-                    navigator.clipboard.writeText(generateQRUrl());
-                    // TODO: Mostrar toast de sucesso
-                  }}
+                  onClick={copyUrl}
                 >
                   Copiar URL
                 </Button>
